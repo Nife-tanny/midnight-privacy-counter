@@ -21,7 +21,7 @@ jobs:
 
       - name: Install the Compact compiler
         run: |
-          curl --proto '=https' --tlsv1.2 -sSf https://github.com/midnightntwrk/compact/releases/latest/download/compact-installer.sh | sh
+          curl --proto '=https' --tlsv1.2 -sSfL https://github.com/midnightntwrk/compact/releases/latest/download/compact-installer.sh | sh
           echo "$HOME/.local/bin" >> "$GITHUB_PATH"
 
       - name: Pin Compact compiler version

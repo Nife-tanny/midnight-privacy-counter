@@ -1,0 +1,56 @@
+pragma language_version >= 0.23;
+
+import CompactStandardLibrary;
+
+/*
+ * counter.compact — a secret-gated public counter.
+ *
+ * PUBLIC (on-chain ledger state, visible to anyone who reads the chain):
+ *   - `count`    : Counter — how many times the counter has been incremented.
+ *   - `ownerKey` : Bytes<32> — a commitment (hash) to the owner's secret,
+ *                  set once at deploy time. This is safe to publish: it does
+ *                  not reveal the secret itself, only a fingerprint of it.
+ *
+ * PRIVATE (witness, supplied off-chain by the caller's TypeScript runtime —
+ * never written to the ledger and never included in any transaction):
+ *   - `secretKey()` : Bytes<32> — the owner's raw secret. Only a hash derived
+ *                     from it (via `deriveOwnerKey`) ever touches the chain.
+ *
+ * PROVEN WITHOUT REVEALING:
+ *   Calling `increment` proves the caller knows the secret behind `ownerKey`
+ *   — the secret itself never leaves the witness function on the caller's
+ *   machine and is never disclosed on-chain. Only the fact that a valid
+ *   increment happened, and the new count, become public.
+ */
+
+export ledger count: Counter;
+export ledger ownerKey: Bytes<32>;
+
+// Supplied by the TypeScript runtime at call time; never appears on-chain.
+witness secretKey(): Bytes<32>;
+
+// One-time setup at deploy: commit to the owner's secret. The commitment
+// itself is intentionally public, so it must be explicitly disclosed.
+constructor(initialOwnerKey: Bytes<32>) {
+  ownerKey = disclose(initialOwnerKey);
+}
+
+// Increment the counter. Only succeeds if the caller supplies the secret
+// matching `ownerKey` — proof of knowledge, not the secret, is what's public.
+export circuit increment(): [] {
+  assert(
+    deriveOwnerKey(secretKey()) == ownerKey,
+    "increment: caller does not hold the owner secret"
+  );
+  count.increment(1);
+}
+
+export circuit getCount(): Uint<64> {
+  return count;
+}
+
+// Domain-separated hash so this commitment can't collide with hashes used
+// elsewhere in the contract or in other contracts.
+export circuit deriveOwnerKey(sk: Bytes<32>): Bytes<32> {
+  return persistentHash<Vector<2, Bytes<32>>>([pad(32, "counter-app:owner-key:"), sk]);
+}

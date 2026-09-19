@@ -1,4 +1,4 @@
-# counter-app
+# midnight-privacy-counter
 
 > A secret-gated counter: anyone can read the public tally, but only the holder of a private secret can increment it — without ever revealing that secret on-chain.
 

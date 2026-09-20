@@ -25,6 +25,10 @@ jobs:
           echo "$HOME/.local/bin" >> "$GITHUB_PATH"
 
       - name: Pin Compact compiler version
+        # Authenticated so this doesn't hit GitHub's 60/hr unauthenticated
+        # API rate limit, which shared runner IPs can already be near.
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: compact update "$(cat .compact-version)"
 
       - name: Install dependencies

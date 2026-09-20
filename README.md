@@ -83,12 +83,15 @@ npm run test:e2e   # smoke test against a live deployment
 - Privacy — the raw secret never appears anywhere in the decoded public ledger state.
 
 ## Initial Idea
-
-[LEAVE PLACEHOLDER — I will fill this in manually]
+This project was built as part of the Midnight Builder Challenge (Level 1). 
+I picked a simple counter contract to learn the fundamentals of Compact — 
+specifically how public ledger state and private witness inputs work 
+together, and how disclose() lets you selectively reveal private data 
+when needed.
 
 ## Screenshots
-
-[LEAVE PLACEHOLDER — I will add compile output and contract address screenshots]
+![Compile output](./screenshots/compile-output.png)
+![Deployed contract address](./screenshots/contract-address.png)
 
 ## Project structure
 
